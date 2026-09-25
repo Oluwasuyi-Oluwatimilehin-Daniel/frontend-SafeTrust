@@ -13,8 +13,9 @@
 ## Data layer
 
 ```text
-src/lib/mockData/          ← source of truth for stub data
-src/hooks/useApartments.ts ← mock hook (Apollo shape)
+src/lib/mockData/                  ← source of truth for stub data
+src/hooks/useApartments.ts         ← mock hook (Apollo shape)
+src/hooks/useEscrowSubscription.ts ← mock hook (Apollo shape)
 ```
 
 Every hook returns `{ data, loading, error }` matching Apollo's `useQuery` return shape. This means when a component is "promoted" to dApp-SafeTrust, the only change needed is the hook import — the JSX is identical.
@@ -24,7 +25,6 @@ Every hook returns `{ data, loading, error }` matching Apollo's `useQuery` retur
 ```text
 src/providers/
 ├── TrustlessWorkProvider.tsx  ← pass-through (no SDK)
-├── ApolloProviderWrapper.tsx  ← pass-through (no Apollo)
 ├── ClientProviders.tsx        ← pass-through wrapper
 └── QueryProvider.tsx          ← pass-through (no ReactQuery)
 ```
