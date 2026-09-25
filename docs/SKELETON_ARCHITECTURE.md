@@ -14,11 +14,11 @@
 
 ```text
 src/lib/mockData/                  ← source of truth for stub data
-src/hooks/useApartments.ts         ← mock hook (Apollo shape)
-src/hooks/useEscrowSubscription.ts ← mock hook (Apollo shape)
+src/hooks/useApartments.ts         ← mock hook (Apollo { data, loading, error } shape)
+src/hooks/useEscrowSubscription.ts ← mock hook ({ escrow, loading, error } shape)
 ```
 
-Every hook returns `{ data, loading, error }` matching Apollo's `useQuery` return shape. This means when a component is "promoted" to dApp-SafeTrust, the only change needed is the hook import — the JSX is identical.
+Query hooks return `{ data, loading, error }` matching Apollo's `useQuery` return shape, while subscription hooks return resource-specific contracts like `{ escrow, loading, error }`. This means when a component is "promoted" to dApp-SafeTrust, the only change needed is the hook import — the JSX is identical.
 
 ## Provider stubs
 
