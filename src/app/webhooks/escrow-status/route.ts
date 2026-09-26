@@ -37,7 +37,7 @@ function verifySignature(rawBody: string, signature: string, secret: string) {
 }
 
 export async function POST(request: NextRequest) {
-  const secret = process.env.TRUSTLESS_WORK_WEBHOOK_SECRET;
+  const secret = "";
   if (!secret) {
     return NextResponse.json({ error: 'Missing TRUSTLESS_WORK_WEBHOOK_SECRET' }, { status: 500 });
   }

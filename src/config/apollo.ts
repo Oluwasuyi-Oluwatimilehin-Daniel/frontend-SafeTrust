@@ -16,7 +16,7 @@ const authLink = setContext(async (_, { headers }) => {
 export const apolloClient = new ApolloClient({
   link: authLink.concat(
     createHttpLink({
-      uri: process.env.NEXT_PUBLIC_HASURA_GRAPHQL_URL,
+      uri: "http://localhost:8080/v1/graphql",
       fetchOptions: { cache: "no-store" },
     })
   ),
