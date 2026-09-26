@@ -81,7 +81,7 @@ If you have an existing `.env.local` file, you must update the following renamed
 | `NEXT_PUBLIC_WEBHOOK_URL` | *(removed)* | Unused server route `src/app/api/auth/forgot-password` deleted |
 
 > [!NOTE]
-> Client variables must begin with `NEXT_PUBLIC_` and are inlined statically at build time. Server-only secrets (like `BACKEND_URL` and `SKIP_AUTH_MIDDLEWARE`) must **never** be prefixed with `NEXT_PUBLIC_`.
+> Client variables must begin with `NEXT_PUBLIC_` and are inlined statically at build time. Server-only secrets (like `BACKEND_URL`, `SKIP_AUTH_MIDDLEWARE`, and `TRUSTLESS_WORK_WEBHOOK_SECRET`) must **never** be prefixed with `NEXT_PUBLIC_`.
 
 ## Architecture
 

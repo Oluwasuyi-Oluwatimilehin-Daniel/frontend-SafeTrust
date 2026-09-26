@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom';
 
+// Prevent server-only import failures in Jest jsdom test environment
+jest.mock('server-only', () => ({}));
+
 // Provide fallback environment variables for tests
 process.env.NEXT_PUBLIC_FIREBASE_API_KEY =
   process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'mock-api-key';

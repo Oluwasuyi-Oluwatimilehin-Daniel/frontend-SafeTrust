@@ -13,17 +13,18 @@ describe("Environment Variable Contract", () => {
 
   describe("clientSchema", () => {
     it("parses valid full client environment configuration", () => {
+      const validStellarAddress =
+        "GAK6DAPPQDDPSQRXTLWD6SGCOYAXWYP7XKSQNMEIZW6TSW7GKVASZIAH";
       const parsed = clientSchema.parse({
         ...validFirebaseConfig,
         NEXT_PUBLIC_TRUSTLESS_API_URL: "https://dev.api.trustlesswork.com",
         NEXT_PUBLIC_TRUSTLESS_API_KEY: "my-key",
         NEXT_PUBLIC_TRUSTLESS_NETWORK: "testnet",
-        NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS:
-          "GA2H7TG4ND7IZ7DYDYI5PP5R7Q7J5N6XDF2R2G4O5Y3G4N6O5Y3G4N6O",
-        NEXT_PUBLIC_DISPUTE_RESOLVER_ADDRESS:
-          "GA2H7TG4ND7IZ7DYDYI5PP5R7Q7J5N6XDF2R2G4O5Y3G4N6O5Y3G4N6O",
-        NEXT_PUBLIC_USDC_ISSUER:
-          "GA2H7TG4ND7IZ7DYDYI5PP5R7Q7J5N6XDF2R2G4O5Y3G4N6O5Y3G4N6O",
+        NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS: validStellarAddress,
+        NEXT_PUBLIC_DISPUTE_RESOLVER_ADDRESS: validStellarAddress,
+        NEXT_PUBLIC_USDC_ISSUER: validStellarAddress,
+        NEXT_PUBLIC_HASURA_GRAPHQL_URL: "http://localhost:8080/v1/graphql",
+        NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: "wc-project-id",
       });
 
       expect(parsed.NEXT_PUBLIC_FIREBASE_API_KEY).toBe("valid-api-key");
@@ -31,6 +32,10 @@ describe("Environment Variable Contract", () => {
         "https://dev.api.trustlesswork.com"
       );
       expect(parsed.NEXT_PUBLIC_TRUSTLESS_NETWORK).toBe("testnet");
+      expect(parsed.NEXT_PUBLIC_HASURA_GRAPHQL_URL).toBe(
+        "http://localhost:8080/v1/graphql"
+      );
+      expect(parsed.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID).toBe("wc-project-id");
     });
 
     it("applies defaults for trustless config when optional/undefined", () => {
@@ -43,7 +48,11 @@ describe("Environment Variable Contract", () => {
       );
       expect(parsed.NEXT_PUBLIC_TRUSTLESS_NETWORK).toBe("testnet");
       expect(parsed.NEXT_PUBLIC_TRUSTLESS_API_KEY).toBe("");
+      expect(parsed.NEXT_PUBLIC_HASURA_GRAPHQL_URL).toBe(
+        "http://localhost:8080/v1/graphql"
+      );
       expect(parsed.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS).toBeUndefined();
+      expect(parsed.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID).toBeUndefined();
     });
 
     it("fails fast with a zod error naming the variable when Firebase API key is missing", () => {
@@ -74,10 +83,13 @@ describe("Environment Variable Contract", () => {
       }
     });
 
-    it("validates Stellar wallet addresses with regex /^G[A-Z2-7]{55}$/", () => {
+    it("validates Stellar wallet addresses using StrKey checksum validation", () => {
       const validAddress =
+        "GAK6DAPPQDDPSQRXTLWD6SGCOYAXWYP7XKSQNMEIZW6TSW7GKVASZIAH";
+      // 56 chars matching regex format but invalid StrKey checksum
+      const invalidChecksumAddress =
         "GA2H7TG4ND7IZ7DYDYI5PP5R7Q7J5N6XDF2R2G4O5Y3G4N6O5Y3G4N6O";
-      const invalidAddress = "0x1234567890abcdef";
+      const invalidFormatAddress = "0x1234567890abcdef";
 
       expect(
         clientSchema.safeParse({
@@ -89,7 +101,14 @@ describe("Environment Variable Contract", () => {
       expect(
         clientSchema.safeParse({
           ...validFirebaseConfig,
-          NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS: invalidAddress,
+          NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS: invalidChecksumAddress,
+        }).success
+      ).toBe(false);
+
+      expect(
+        clientSchema.safeParse({
+          ...validFirebaseConfig,
+          NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS: invalidFormatAddress,
         }).success
       ).toBe(false);
     });
@@ -137,6 +156,16 @@ describe("Environment Variable Contract", () => {
 
       const parsed = serverSchema.parse({});
       expect(parsed.SKIP_AUTH_MIDDLEWARE).toBe(false);
+    });
+
+    it("parses TRUSTLESS_WORK_WEBHOOK_SECRET and allows undefined", () => {
+      const withSecret = serverSchema.parse({
+        TRUSTLESS_WORK_WEBHOOK_SECRET: "whsec_test_secret_123",
+      });
+      expect(withSecret.TRUSTLESS_WORK_WEBHOOK_SECRET).toBe("whsec_test_secret_123");
+
+      const withoutSecret = serverSchema.parse({});
+      expect(withoutSecret.TRUSTLESS_WORK_WEBHOOK_SECRET).toBeUndefined();
     });
   });
 });
